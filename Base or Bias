@@ -1,0 +1,162 @@
+#include <bits/stdc++.h>
+#define forn(i, n) for (int i = 0; i < int(n); i++)
+#define formn(i, m, n) for (int i = int(m); i < int(n); i++)
+#define X first
+#define Y second
+
+const int maxn = 1e6+10;
+const int base = 31337;
+const int mod = 1e9+7;
+const int inf = 0x3f3f3f3f;
+const int logo = 20;
+const int off = 1 << logo;
+const int treesiz = off << 1;
+
+using namespace std;
+typedef long long ll;
+
+template<int m>
+struct modint{
+	unsigned int x;
+	constexpr modint()noexcept:x(){}
+	template<typename T>
+	constexpr modint(T x_)noexcept:x((x_%=m)<0?x_+m:x_){}
+	constexpr unsigned int val()const noexcept{return x;}
+	constexpr modint&operator++()noexcept{if(++x==m)x=0;return*this;}
+	constexpr modint&operator--()noexcept{if(x==0)x=m;--x;return*this;}
+	constexpr modint operator++(int)noexcept{modint res=*this;++*this;return res;}
+	constexpr modint operator--(int)noexcept{modint res=*this;--*this;return res;}
+	constexpr modint&operator+=(const modint&a)noexcept{x+=a.x;if(x>=m)x-=m;return*this;}
+	constexpr modint&operator-=(const modint&a)noexcept{if(x<a.x)x+=m;x-=a.x;return*this;}
+	constexpr modint&operator*=(const modint&a)noexcept{x=(unsigned long long)x*a.x%m;return*this;}
+	constexpr modint&operator/=(const modint&a)noexcept{return*this*=a.inv();}
+	constexpr modint operator+()const noexcept{return*this;}
+	constexpr modint operator-()const noexcept{return modint()-*this;}
+	constexpr modint pow(long long n)const noexcept
+	{
+		if(n<0)return pow(-n).inv();
+		modint x=*this,r=1;
+		for(;n;x*=x,n>>=1)if(n&1)r*=x;
+		return r;
+	}
+	constexpr modint inv()const noexcept
+	{
+		int s=x,t=m,x=1,u=0;
+		while(t)
+		{
+			int k=s/t;
+			s-=k*t;
+			swap(s,t);
+			x-=k*u;
+			swap(x,u);
+		}
+		return modint(x);
+	}
+	friend constexpr modint operator+(const modint&a,const modint&b){return modint(a)+=b;}
+	friend constexpr modint operator-(const modint&a,const modint&b){return modint(a)-=b;}
+	friend constexpr modint operator*(const modint&a,const modint&b){return modint(a)*=b;}
+	friend constexpr modint operator/(const modint&a,const modint&b){return modint(a)/=b;}
+	friend constexpr bool operator==(const modint&a,const modint&b){return a.x==b.x;}
+	friend constexpr bool operator!=(const modint&a,const modint&b){return a.x!=b.x;}
+	friend ostream&operator<<(ostream&os,const modint&a){return os<<a.x;}
+	friend istream&operator>>(istream&is,modint&a){long long v;is>>v;a=modint(v);return is;}
+};
+
+using mint = modint<mod>;
+
+namespace Combine{
+	const int Combine_max = maxn;
+	mint fac[Combine_max];
+	void init() { fac[0] = 1; for (int i = 1; i < Combine_max; ++ i) fac[i] = fac[i - 1] * i; }
+	mint A(int n, int m) { return fac[n] / fac[n - m]; }
+	mint C(int n, int m) {
+        // cout<<"C: "<<n<<" "<<m<<endl;
+        return fac[n] / (fac[n - m] * fac[m]); }
+	mint fpow(mint x, int exp){
+		mint res = 1;
+		for (; exp; x *= x, exp >>= 1) if (exp & 1) res *= x;
+		return res;
+	}
+}
+
+void sol(){
+    int i,n,b;
+    cin>>n>>b;
+	vector<int> a(b),t(b,0);
+	for (i=0;i<n;i++) cin>>a[n-i-1];
+
+	auto xx = [&](){
+		for (i=b-1;i>=0;i--) t[i]=b-1-i;
+		t[b-1]=1; t[b-2]=0;
+		mint ans=0;
+		for (i=b-1;i>=0;i--) ans=ans*b+(t[i]-a[i]);
+		cout<<ans.val()<<endl;
+	};
+
+	auto yy = [&](){
+		t[0]=0;
+		t.resize(b+1, 0);
+		a.resize(b+1, 0);
+		for (i=b-2;i>=0;i--) t[i]=b-i-1;
+		t[b]=1; t[b-1]=t[b-2]=0;
+		mint ans=0;
+		for (i=b;i>=0;i--) ans=ans*b+(t[i]-a[i]);
+		cout<<ans.val()<<endl;
+	};
+
+
+	if (n<b){
+		xx();
+		return;
+	}
+	set<int> X;
+	int okp=b;
+	int okv=0;
+	for (i=0;i<b;i++) X.insert(i);
+	for (i=n-1;i>=-1;i--){
+		int nd=X.size();
+		int hv=i+1;
+		// cout<<"nd:"<<nd<<" hv:"<<hv<<endl;
+		if (hv<nd) break;
+
+		if (i==-1){
+			okp=-1;
+			okv=0;
+			break;
+		}
+		X.erase(a[i]);
+		auto it=X.lower_bound(a[i]+1);
+		if (it==X.end()) continue;
+		okp=i;
+		okv=*it;
+	}
+	if (okp==-1) {
+		cout<<0<<endl;
+		return;
+	}
+	if (okp==b){
+		yy();
+		return;
+	}
+	for (i=0;i<b;i++) t[i]=a[i];
+	t[okp]=okv;
+	for (i=0;i<b;i++) X.insert(i);
+	for (i=b-1;i>=okp;i--) X.erase(t[i]);
+	for (i=okp-1;i>=0;i--){
+		t[i]=*X.begin();
+		X.erase(X.begin());
+	}
+	mint ans=0;
+	for (i=b-1;i>=0;i--) ans=ans*b+(t[i]-a[i]);
+	cout<<ans.val()<<endl;
+}
+
+int main() {
+    int t = 1;
+    Combine::init();
+    ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+    cin>>t;
+    while(t--)
+        sol();
+    return 0;
+}
