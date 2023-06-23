@@ -1,0 +1,17 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+	// your code goes here
+	int t,f,e,c;
+	cin>>t;
+	while(t--){
+	    cin>>f>>c>>e;
+	    if(c-e>=f){
+	        cout<<"Yes"<<endl;
+	    }
+	    else{
+	        cout<<"No"<<endl;
+	    }}
+	return 0;
+}
