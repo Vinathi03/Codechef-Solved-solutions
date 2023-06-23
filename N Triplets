@@ -1,0 +1,30 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    long long t;
+    cin>>t;
+    while(t--) {
+        int n,i;
+        cin>>n;
+        set<int> map;
+        map.insert(1);
+        for(i=2;i*i<=n;i++)
+        {
+            if(n%i==0)
+            {
+                map.insert(i);
+                map.insert(n/i);
+                break;
+            }
+        }
+        if(map.size()!=3)
+        cout<<-1<<endl;
+        else {
+            for(int val : map)
+            cout<<val<<" ";
+            cout<<endl;
+        }
+    }
+  return 0;
+}
